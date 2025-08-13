@@ -121,17 +121,39 @@
     .text-success {
       color: var(--text-success);
     }
+    #theme-toggle {
+      z-index: 1000;
+      min-width: 48px;
+      min-height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
     @media (max-width: 640px) {
       .container {
         padding: 1rem;
+      }
+      .absolute.top-6.right-6 {
+        top: 1.5rem;
+        right: 1.5rem;
+        padding-right: env(safe-area-inset-right);
+        padding-top: env(safe-area-inset-top);
+      }
+      #theme-toggle {
+        padding: 0.75rem;
+        font-size: 1.25rem;
+      }
+      #theme-toggle span:not(#theme-icon) {
+        display: none;
       }
     }
   </style>
 </head>
 <body class="flex flex-col min-h-screen">
-  <div class="absolute top-4 right-4">
-    <button id="theme-toggle" class="bg-gray-600 text-white px-3 py-1 rounded-md text-sm">
-      <span id="theme-icon">🌙</span> Cambiar tema
+  <div class="absolute top-6 right-6 z-50">
+    <button id="theme-toggle" class="bg-gray-600 text-white px-3 py-2 rounded-md text-sm flex items-center justify-center">
+      <span id="theme-icon">🌙</span>
+      <span class="hidden sm:inline ml-1">Cambiar tema</span>
     </button>
   </div>
   <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-grow">
@@ -209,7 +231,6 @@
     </div>
   </main>
 
- 
   <script>
     // Manejo del tema claro/oscuro
     const html = document.documentElement;

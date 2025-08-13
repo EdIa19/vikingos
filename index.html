@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TAQUERIA - VIKINGOS</title>
+  <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/3565/3565418.png" type="image/png">
+  <script src="https://cdn.tailwindcss.com/3.4.1"></script>
+  <style>
+    /* Estilos base para modo oscuro */
+    [data-theme="dark"] {
+      --bg-body: linear-gradient(135deg, #1e1e2f, #3c3c5a);
+      --bg-card: rgba(42, 42, 64, 0.95);
+      --text-primary: #ffffff;
+      --text-secondary: #d1d5db;
+      --text-muted: #ffffff;
+      --text-error: #ef4444;
+      --text-success: #4ade80;
+      --bg-input: #374151;
+      --bg-pedido-item: #c6cdd8;
+      --border-accent: #eab308;
+      --btn-primary: linear-gradient(to right, #FFD700, #FFA500);
+      --btn-primary-hover: linear-gradient(to right, #e6c200, #FF8C00);
+      --btn-secondary: linear-gradient(to right, #00bfff, #1e90ff);
+      --btn-secondary-hover: linear-gradient(to right, #009acd, #187bcd);
+    }
+
+    /* Estilos para modo claro */
+    [data-theme="light"] {
+      --bg-body: linear-gradient(135deg, #f3f4f6, #e5e7eb);
+      --bg-card: rgba(255, 255, 255, 0.95);
+      --text-primary: #1f2937;
+      --text-secondary: #4b5563;
+      --text-muted: #6b7280;
+      --text-error: #dc2626;
+      --text-success: #16a34a;
+      --bg-input: #e5e7eb;
+      --bg-pedido-item: #d1d5db;
+      --border-accent: #ca8a04;
+      --btn-primary: linear-gradient(to right, #f59e0b, #d97706);
+      --btn-primary-hover: linear-gradient(to right, #e48f06, #c26805);
+      --btn-secondary: linear-gradient(to right, #0284c7, #0369a1);
+      --btn-secondary-hover: linear-gradient(to right, #0274b0, #025a87);
+    }
+
+    body {
+      background: var(--bg-body);
+      min-height: 100vh;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+    }
+    .gradient-text {
+      background: var(--btn-primary);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .card {
+      background: var(--bg-card);
+      backdrop-filter: blur(10px);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 25px rgba(255, 255, 255, 0.3);
+    }
+    .input-focus {
+      transition: all 0.3s ease;
+      background: var(--bg-input);
+      color: var(--text-primary);
+    }
+    .input-focus:focus {
+      border-color: var(--border-accent);
+      box-shadow: 0 0 0 3px rgba(234, 179, 8, 0.3);
+    }
+    .btn-primary {
+      background: var(--btn-primary);
+      transition: all 0.3s ease;
+    }
+    .btn-primary:hover {
+      background: var(--btn-primary-hover);
+      transform: translateY(-2px);
+    }
+    .btn-secondary {
+      background: var(--btn-secondary);
+    }
+    .btn-secondary:hover {
+      background: var(--btn-secondary-hover);
+      transform: translateY(-2px);
+    }
+    .btn-delete {
+      transition: all 0.3s ease;
+    }
+    .btn-delete:hover {
+      background-color: #dc2626;
+      transform: translateY(-2px);
+    }
+    .btn-geolocation {
+      transition: all 0.3s ease;
+      background: var(--bg-input);
+      color: var(--text-primary);
+    }
+    .btn-geolocation:hover {
+      background: #4b5563;
+      transform: translateY(-2px);
+    }
+    .pedido-item {
+      background: var(--bg-pedido-item);
+      border-left: 4px solid var(--border-accent);
+    }
+    .text-primary {
+      color: var(--text-primary);
+    }
+    .text-secondary {
+      color: var(--text-secondary);
+    }
+    .text-muted {
+      color: var(--text-muted);
+    }
+    .text-error {
+      color: var(--text-error);
+    }
+    .text-success {
+      color: var(--text-success);
+    }
+    @media (max-width: 640px) {
+      .container {
+        padding: 1rem;
+      }
+    }
+  </style>
+</head>
+<body class="flex flex-col min-h-screen">
+  <div class="absolute top-4 right-4">
+    <button id="theme-toggle" class="bg-gray-600 text-white px-3 py-1 rounded-md text-sm">
+      <span id="theme-icon">🌙</span> Cambiar tema
+    </button>
+  </div>
+  <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-grow">
+    <div class="card max-w-3xl mx-auto p-6 sm:p-8 rounded-2xl shadow-xl">
+      <h1 class="text-3xl sm:text-4xl font-bold text-center mb-4 gradient-text">𖤍 TAQUERIA - VIKINGOS 𖤍</h1>
+      <h2 class="text-xl sm:text-2xl text-center mb-8 text-secondary">⚔️ Ordene su pedido ⚔️</h2>
+
+      <!-- Selección de categoría -->
+      <div class="mb-6">
+        <label for="producto" class="block text-sm font-medium text-secondary mb-2">🍽️ Categoría de producto:</label>
+        <select id="producto" onchange="mostrarOpciones()" class="w-full p-3 rounded-lg input-focus">
+          <option value="">-- Selecciona Producto --</option>
+          <option value="Tacos">Tacos</option>
+          <option value="PorKilo">Por Kilo</option>
+          <option value="Tortas">Tortas</option>
+          <option value="Hamburguesas">Hamburguesas</option>
+          <option value="Alambres">Alambres</option>
+          <option value="Huaraches">Huaraches</option>
+          <option value="Paquetes">Paquetes</option>
+          <option value="Combos">Combos</option>
+          <option value="Tortillas">Tortillas</option>
+        </select>
+      </div>
+
+      <!-- Opciones dinámicas según categoría -->
+      <div id="opciones" class="space-y-4"></div>
+
+      <!-- Cantidad -->
+      <div id="divCantidad" class="mb-6 hidden">
+        <label for="cantidad" class="block text-sm font-medium text-secondary mb-2">Cantidad:</label>
+        <input type="number" id="cantidad" value="1" min="1" class="w-full p-3 rounded-lg input-focus" />
+      </div>
+
+      <button onclick="agregarAlPedido()" class="btn-primary w-full py-3 rounded-lg font-bold text-gray-900 text-lg">Agregar al pedido</button>
+
+      <!-- Lista del pedido -->
+      <div id="listaPedido" class="mt-6 space-y-4"></div>
+      <p class="text-lg font-semibold text-secondary"><strong>Total:</strong> $<span id="total">0</span></p>
+
+      <!-- Tipo de pago -->
+      <section class="mt-6">
+        <label for="tipoPago" class="block text-sm font-medium text-secondary mb-2">💳 Tipo de pago:</label>
+        <select id="tipoPago" onchange="cambiarOpcionesPago()" class="w-full p-3 rounded-lg input-focus">
+          <option value="">-- Selecciona --</option>
+          <option value="Transferencia">Transferencia</option>
+          <option value="Tarjeta">Tarjeta</option>
+          <option value="Efectivo">Efectivo</option>
+        </select>
+        <div id="detallesPago" class="mt-4"></div>
+      </section>
+
+      <!-- Datos del cliente -->
+      <section id="datosCliente" class="mt-6 space-y-4">
+        <h3 class="text-xl font-semibold text-secondary">Datos del cliente</h3>
+        <div>
+          <label for="nombre" class="block text-sm font-medium text-secondary mb-2">Nombre:</label>
+          <input type="text" id="nombre" placeholder="Tu nombre" required class="w-full p-3 rounded-lg input-focus" />
+        </div>
+        <div>
+          <label for="apellido" class="block text-sm font-medium text-secondary mb-2">Apellido:</label>
+          <input type="text" id="apellido" placeholder="Tu apellido" required class="w-full p-3 rounded-lg input-focus" />
+        </div>
+        <div>
+          <label for="direccion" class="block text-sm font-medium text-secondary mb-2">Dirección o link de ubicación (Google Maps):</label>
+          <div class="flex flex-col sm:flex-row gap-2">
+            <input type="text" id="direccion" placeholder="Ej. Av. Juárez 123 o link Google Maps" class="w-full p-3 rounded-lg input-focus" />
+            <button onclick="obtenerUbicacion()" title="Obtener ubicación" class="btn-geolocation px-4 py-2 rounded-md text-sm sm:w-auto">Usar mi ubicación</button>
+          </div>
+          <p id="errorUbicacion" class="text-sm italic text-error mt-2 hidden">No se pudo obtener la ubicación. Por favor, ingresa una dirección manualmente o envía tu ubicación por WhatsApp.</p>
+          <p class="text-sm italic text-muted mt-2">* O envía tu ubicación por WhatsApp después de completar el pedido.</p>
+        </div>
+      </section>
+
+      <button onclick="enviarPedido()" class="btn-secondary w-full py-3 rounded-lg font-bold text-white text-lg mt-6">📲 Enviar pedido por WhatsApp</button>
+    </div>
+  </main>
+
+ 
+  <script>
+    // Manejo del tema claro/oscuro
+    const html = document.documentElement;
+    const themeToggle = document.getElementById('theme-toggle');
+    const themeIcon = document.getElementById('theme-icon');
+
+    function setTheme(theme) {
+      html.setAttribute('data-theme', theme);
+      themeIcon.textContent = theme === 'dark' ? '🌙' : '☀️';
+      localStorage.setItem('theme', theme);
+    }
+
+    // Cargar tema guardado o predeterminado
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+    setTheme(savedTheme);
+
+    themeToggle.addEventListener('click', () => {
+      const currentTheme = html.getAttribute('data-theme');
+      const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      setTheme(newTheme);
+    });
+
+    const productos = {
+      Tacos: {
+        SUADERO: 18,
+        "SUADERO CON QUESO": 35,
+        LONGANIZA: 18,
+        "LONGANIZA CON QUESO": 35,
+        PASTOR: 18,
+        "PASTOR CON QUESO": 35,
+        TRIPA: 20,
+        CABEZA: 20,
+        AGUJA: 35,
+        COSTILLA: 35,
+        CHISTORRA: 35,
+        "TACOS DORADOS": 60
+      },
+      PorKilo: {
+        "Suadero 1/2kg": 200,
+        "Suadero 1kg": 380,
+        "Longaniza 1/2kg": 195,
+        "Longaniza 1kg": 380,
+        "Pastor 1/2kg": 200,
+        "Pastor 1kg": 380,
+        "Costilla 1/2kg": 220,
+        "Costilla 1kg": 400,
+        "Bistec 1/2kg": 200,
+        "Bistec 1kg": 380,
+        "Campechano 1kg": 400,
+        "Arrachera 1kg": 450,
+        "Chistorra 1kg": 420,
+        "Chorizo Argentino 1kg": 450,
+        "Aguja Norteña 1kg": 450
+      },
+      Tortas: {
+        Sencilla: 75,
+        Hawaiana: 90,
+        Vikinga: 90,
+        "Con Queso": 85
+      },
+      Hamburguesas: {
+        Tradicional: 80,
+        Hawaiana: 90,
+        Especial: 110,
+        Vikinga: 90
+      },
+      Alambres: {
+        "Tradicional de Pastor - Individual": 160,
+        "Tradicional de Pastor - Mediano": 280,
+        "Tradicional de Pastor - Familiar": 400,
+        "Bistec o Pechuga - Individual": 160,
+        "Bistec o Pechuga - Mediano": 280,
+        "Bistec o Pechuga - Familiar": 400,
+        "Zarape - Individual": 180,
+        "Zarape - Mediano": 280,
+        "Zarape - Familiar": 420,
+        "Hawaiano con Piña - Individual": 160,
+        "Hawaiano con Piña - Mediano": 280,
+        "Hawaiano con Piña - Familiar": 400
+      },
+      Huaraches: {
+        Tradicional: 75,
+        Especial: 100
+      },
+      Paquetes: {
+        "Infantil 1": 60,
+        "Infantil 2": 70,
+        "Infantil 3": 85
+      },
+      Combos: {
+        Pareja: 150,
+        Amigos: 250,
+        Familia: 400,
+        Mixtos: 380
+      },
+      Tortillas: {
+        "10 Maíz": 10,
+        "12 Harina": 25
+      }
+    };
+
+    const descripciones = {
+      Hamburguesas: {
+        Tradicional: "Lleva jamón, tocino, Q.Blanco, Q. Amarrillo.",
+        Hawaiana: "Incluye Piña.",
+        Especial: "Incluye Champiñones.",
+        Vikinga: "Carne al Pastor, Jamón, Lechuga, Tocino, Q. Amarrillo, Q. Blanco."
+      },
+      Tortas: {
+        Hawaiana: "Con pastor, jamón, piña y queso Oaxaca.",
+        Vikinga: "Aguacate, jitomate, cebolla, frijoles, bistec, pastor, pollo."
+      }
+    };
+
+    let pedido = [];
+
+    function mostrarOpciones() {
+      const prod = document.getElementById('producto').value;
+      const opciones = document.getElementById('opciones');
+      opciones.innerHTML = '';
+
+      document.getElementById('divCantidad').classList.remove('hidden');
+
+      if (productos[prod]) {
+        let html = `
+          <div class="mb-4">
+            <label class="block text-sm font-medium text-secondary mb-2">Tipo:</label>
+            <select id="tipo" onchange="actualizarDescripcion('${prod}'); mostrarTipoCarneHuaraches()" class="w-full p-3 rounded-lg input-focus">
+        `;
+        for (let tipo in productos[prod]) {
+          html += `<option value="${tipo}">${tipo} - $${productos[prod][tipo]}</option>`;
+        }
+        html += `</select></div>`;
+
+        html += `<div id="descripcionProducto" class="text-sm italic text-muted mb-4"></div>`;
+
+        if (["Tacos", "Alambres", "Huaraches"].includes(prod)) {
+          html += `
+            <div class="mb-4">
+              <label class="block text-sm font-medium text-secondary mb-2">¿Con verdura?</label>
+              <select id="verdura" class="w-full p-3 rounded-lg input-focus">
+                <option value="Sí">Sí</option>
+                <option value="No">No</option>
+              </select>
+            </div>
+            <div class="mb-4">
+              <label class="block text-sm font-medium text-secondary mb-2">Tipo de salsa:</label>
+              <select id="salsa" class="w-full p-3 rounded-lg input-focus">
+                <option value="Verde">Verde</option>
+                <option value="Verde Aparte">Verde Aparte</option>
+                <option value="Roja">Roja</option>
+                <option value="Roja Aparte">Roja Aparte</option>
+                <option value="Sin salsa">Sin salsa</option>
+              </select>
+            </div>
+          `;
+        }
+
+        if (prod === "Tortas") {
+          html += `
+            <div class="mb-4 hidden" id="labelCarneContainer">
+              <label id="labelCarne" class="block text-sm font-medium text-secondary mb-2">Tipo de carne:</label>
+              <select id="carne" class="w-full p-3 rounded-lg input-focus">
+                <option value="Pastor">Pastor</option>
+                <option value="Bistec">Bistec</option>
+                <option value="Longaniza">Longaniza</option>
+                <option value="Chistorra">Chistorra</option>
+                <option value="Suadero">Suadero</option>
+                <option value="Pollo">Pollo</option>
+                <option value="Bistec de puerco">Bistec de puerco</option>
+              </select>
+            </div>
+          `;
+        }
+
+        if (prod === "Huaraches") {
+          html += `
+            <div class="mb-4 hidden" id="labelCarneHuarachesContainer">
+              <label id="labelCarneHuaraches" class="block text-sm font-medium text-secondary mb-2">Tipo de carne:</label>
+              <select id="carneHuaraches" class="w-full p-3 rounded-lg input-focus">
+                <option value="Pastor">Pastor</option>
+                <option value="Bistec">Bistec</option>
+                <option value="Longaniza">Longaniza</option>
+                <option value="Chistorra">Chistorra</option>
+                <option value="Suadero">Suadero</option>
+                <option value="Pollo">Pollo</option>
+                <option value="Bistec de puerco">Bistec de puerco</option>
+              </select>
+            </div>
+          `;
+        }
+
+        opciones.innerHTML = html;
+        actualizarDescripcion(prod);
+        mostrarTipoCarneHuaraches();
+      }
+    }
+
+    function actualizarDescripcion(prod) {
+      const tipoSelect = document.getElementById('tipo');
+      const descripcionDiv = document.getElementById('descripcionProducto');
+      const carneSelect = document.getElementById('carne');
+      const labelCarne = document.getElementById('labelCarneContainer');
+
+      const tipoSeleccionado = tipoSelect?.value;
+
+      if (descripciones[prod] && descripciones[prod][tipoSeleccionado]) {
+        descripcionDiv.textContent = descripciones[prod][tipoSeleccionado];
+      } else {
+        descripcionDiv.textContent = '';
+      }
+
+      if (prod === "Tortas") {
+        if (["Hawaiana", "Vikinga"].includes(tipoSeleccionado)) {
+          carneSelect?.classList.add('hidden');
+          labelCarne?.classList.add('hidden');
+        } else {
+          carneSelect?.classList.remove('hidden');
+          labelCarne?.classList.remove('hidden');
+        }
+      }
+    }
+
+    function mostrarTipoCarneHuaraches() {
+      const prod = document.getElementById('producto').value;
+      if (prod !== 'Huaraches') return;
+
+      const tipoSelect = document.getElementById('tipo');
+      const tipo = tipoSelect?.value;
+      const labelCarne = document.getElementById('labelCarneHuarachesContainer');
+      const carneSelect = document.getElementById('carneHuaraches');
+
+      if (tipo === 'Especial') {
+        labelCarne?.classList.remove('hidden');
+        carneSelect?.classList.remove('hidden');
+      } else {
+        labelCarne?.classList.add('hidden');
+        carneSelect?.classList.add('hidden');
+      }
+    }
+
+    function agregarAlPedido() {
+      const prod = document.getElementById('producto').value;
+      const tipo = document.getElementById('tipo')?.value;
+      const cant = parseInt(document.getElementById('cantidad').value);
+      const verdura = document.getElementById('verdura')?.value;
+      const salsa = document.getElementById('salsa')?.value;
+
+      let carne = null;
+      if (prod === 'Tortas') carne = document.getElementById('carne')?.value;
+      else if (prod === 'Huaraches' && tipo === 'Especial') carne = document.getElementById('carneHuaraches')?.value;
+
+      if (!prod || !tipo || cant < 1) return alert('Completa todos los campos');
+
+      const precio = productos[prod][tipo];
+      const total = precio * cant;
+
+      pedido.push({ prod, tipo, cant, precio, total, verdura, salsa, carne });
+      actualizarLista();
+    }
+
+    function actualizarLista() {
+      const lista = document.getElementById('listaPedido');
+      const totalEl = document.getElementById('total');
+      lista.innerHTML = '';
+      let total = 0;
+
+      pedido.forEach((item, i) => {
+        total += item.total;
+        let texto = `${item.cant} x ${item.tipo} (${item.prod}) - $${item.total}`;
+        if (["Tacos", "Alambres", "Huaraches"].includes(item.prod)) {
+          texto += `<br>Verdura: ${item.verdura}, Salsa: ${item.salsa}`;
+        }
+        if (item.prod === "Tortas" && item.carne && !["Hawaiana", "Vikinga"].includes(item.tipo)) {
+          texto += `<br>Carne: ${item.carne}`;
+        }
+        if (item.prod === "Huaraches" && item.tipo === "Especial" && item.carne) {
+          texto += `<br>Carne: ${item.carne}`;
+        }
+
+        lista.innerHTML += `
+          <div class="pedido-item rounded-lg p-4">
+            ${texto}
+            <button onclick="eliminarItem(${i})" class="btn-delete bg-red-600 text-white px-3 py-1 rounded-md mt-2 text-sm">❌ Eliminar</button>
+          </div>`;
+      });
+
+      totalEl.textContent = total;
+    }
+
+    function eliminarItem(indice) {
+      if (confirm("¿Estás seguro de eliminar este producto del pedido?")) {
+        pedido.splice(indice, 1);
+        actualizarLista();
+      }
+    }
+
+    function cambiarOpcionesPago() {
+      const tipoPago = document.getElementById('tipoPago').value;
+      const contenedor = document.getElementById('detallesPago');
+      contenedor.innerHTML = '';
+
+      if (tipoPago === 'Transferencia') {
+        contenedor.innerHTML = `
+          <div class="space-y-2">
+            <p class="text-secondary">
+              Número para transferencia: 
+              <strong id="numTransferencia" onclick="copiarCuenta()" class="cursor-pointer text-blue-400 select-all">012 180 01534694099 2</strong>
+              <button onclick="copiarCuenta()" title="Copiar" class="ml-2 bg-gray-600 text-primary px-2 py-1 rounded-md text-sm">Copiar 📋</button>
+              <span id="copiadoTexto" class="text-success hidden">✅ Copiado</span>
+            </p>
+            <p class="text-sm italic text-muted">
+              * En el concepto de la transferencia, escribe tu nombre y apellido. 
+              </p>
+              <p class="text-sm italic text-muted">
+              * Por favor, envía el comprobante vía WhatsApp después de hacer la transferencia.
+            </p>
+          </div>
+        `;
+      } else if (tipoPago === 'Tarjeta') {
+        contenedor.innerHTML = `<p class="text-secondary">El repartidor llevará terminal para pago con tarjeta.</p>`;
+      } else if (tipoPago === 'Efectivo') {
+        contenedor.innerHTML = `
+          <div class="mb-4">
+            <label class="block text-sm font-medium text-secondary mb-2">¿Pagará con cambio?</label>
+            <select id="conCambio" onchange="mostrarTipoBillete()" class="w-full p-3 rounded-lg input-focus">
+              <option value="">-- Selecciona --</option>
+              <option value="Sí">Sí</option>
+              <option value="No">No</option>
+            </select>
+          </div>
+          <div id="tipoBilleteContainer" class="space-y-2"></div>
+        `;
+      }
+    }
+
+    function mostrarTipoBillete() {
+      const conCambio = document.getElementById('conCambio').value;
+      const contenedor = document.getElementById('tipoBilleteContainer');
+      contenedor.innerHTML = '';
+
+      if (conCambio === 'No') {
+        contenedor.innerHTML = `
+          <div>
+            <label class="block text-sm font-medium text-secondary mb-2">¿Con qué tipo de billete pagarás?</label>
+            <input type="number" id="billete" placeholder="Ejemplo: 300 o 500" min="1" class="w-full p-3 rounded-lg input-focus" />
+            <p class="text-sm italic text-muted mt-2">
+              * El repartidor no llevará cambio, por favor paga con el billete exacto o superior.
+            </p>
+          </div>
+        `;
+      }
+    }
+
+    function copiarCuenta() {
+      const texto = document.getElementById("numTransferencia").textContent.trim();
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(texto).then(() => {
+          mostrarMensajeCopiado('copiadoTexto');
+        }).catch(() => {
+          fallbackCopiarTexto(texto, 'copiadoTexto');
+        });
+      } else {
+        fallbackCopiarTexto(texto, 'copiadoTexto');
+      }
+    }
+
+    function obtenerUbicacion() {
+      const errorUbicacion = document.getElementById('errorUbicacion');
+      errorUbicacion.classList.add('hidden');
+
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            const lat = position.coords.latitude;
+            const lon = position.coords.longitude;
+            const googleMapsLink = `https://www.google.com/maps?q=${lat},${lon}`;
+            document.getElementById('direccion').value = googleMapsLink;
+          },
+          (error) => {
+            errorUbicacion.textContent = 'No se pudo obtener la ubicación. Por favor, ingresa una dirección manualmente o envía tu ubicación por WhatsApp.';
+            errorUbicacion.classList.remove('hidden');
+          }
+        );
+      } else {
+        errorUbicacion.textContent = 'Tu navegador no soporta geolocalización. Por favor, ingresa una dirección manualmente o envía tu ubicación por WhatsApp.';
+        errorUbicacion.classList.remove('hidden');
+      }
+    }
+
+    function fallbackCopiarTexto(texto, idMensaje) {
+      const input = document.createElement("input");
+      input.value = texto;
+      document.body.appendChild(input);
+      input.select();
+      input.setSelectionRange(0, 99999);
+      try {
+        const exito = document.execCommand('copy');
+        if (exito) {
+          mostrarMensajeCopiado(idMensaje);
+        } else {
+          alert("No se pudo copiar automáticamente. Por favor selecciona y copia manualmente.");
+        }
+      } catch {
+        alert("No se pudo copiar automáticamente. Por favor selecciona y copia manualmente.");
+      }
+      document.body.removeChild(input);
+    }
+
+    function mostrarMensajeCopiado(idMensaje) {
+      const mensaje = document.getElementById(idMensaje);
+      mensaje.classList.remove("hidden");
+      setTimeout(() => {
+        mensaje.classList.add("hidden");
+      }, 1500);
+    }
+
+    function enviarPedido() {
+      if (pedido.length === 0) return alert("Agrega productos al pedido");
+
+      const referencia = 'PED' + Date.now();
+      let mensaje = `🧾 Pedido ${referencia}\n\n`;
+      let total = 0;
+
+      pedido.forEach((p, i) => {
+        total += p.total;
+        mensaje += `#${i + 1}: ${p.cant} x ${p.tipo} (${p.prod}) - $${p.total}\n`;
+        if (["Tacos", "Alambres", "Huaraches"].includes(p.prod)) {
+          mensaje += `Verdura: ${p.verdura}, Salsa: ${p.salsa}\n`;
+        }
+        if (p.prod === "Tortas" && p.carne && !["Hawaiana", "Vikinga"].includes(p.tipo)) {
+          mensaje += `Carne: ${p.carne}\n`;
+        }
+        if (p.prod === "Huaraches" && p.tipo === "Especial" && p.carne) {
+          mensaje += `Carne: ${p.carne}\n`;
+        }
+        mensaje += '\n';
+      });
+
+      const nombre = document.getElementById('nombre')?.value.trim();
+      const apellido = document.getElementById('apellido')?.value.trim();
+      const direccion = document.getElementById('direccion')?.value.trim();
+
+      if (!nombre || !apellido) {
+        return alert("Por favor ingresa tu nombre y apellido.");
+      }
+
+      if (!direccion) {
+        mensaje += `Cliente: ${nombre} ${apellido}\n`;
+        mensaje += `Ubicación: El cliente enviará la ubicación por WhatsApp.\n\n`;
+      } else {
+        mensaje += `Cliente: ${nombre} ${apellido}\n`;
+        mensaje += `Dirección o ubicación: ${direccion}\n\n`;
+      }
+
+      mensaje += `Total: $${total} MXN\n\n`;
+
+      const tipoPago = document.getElementById('tipoPago').value;
+      if (!tipoPago) return alert("Selecciona un tipo de pago");
+
+      mensaje += `Tipo de pago: ${tipoPago}\n`;
+
+      if (tipoPago === 'Transferencia') {
+        mensaje += `Número de cuenta para transferencia: 012 180 01534694099 2\nPor favor, enviar comprobante por WhatsApp.\n`;
+      } else if (tipoPago === 'Tarjeta') {
+        mensaje += `El repartidor llevará terminal para pago con tarjeta.\n`;
+      } else if (tipoPago === 'Efectivo') {
+        const conCambio = document.getElementById('conCambio')?.value;
+        if (!conCambio) return alert("Indica si pagarás con cambio");
+        mensaje += `¿Pagará con cambio?: ${conCambio}\n`;
+        if (conCambio === 'No') {
+          const billeteStr = document.getElementById('billete')?.value;
+          const billete = Number(billeteStr);
+          if (!billete || billete < total) return alert("Ingresa un billete válido mayor o igual al total");
+          const cambio = billete - total;
+          mensaje += `Pagará con billete de: $${billete}\nCambio: $${cambio}\n* Nota: El repartidor no llevará cambio.\n`;
+        } else {
+          mensaje += `* Nota: El repartidor no llevará cambio.\n`;
+        }
+      }
+
+      if (!direccion) {
+        mensaje += `\nPor favor, envía tu ubicación por WhatsApp después de confirmar el pedido.\n`;
+      }
+
+      const tel = '525525338668';
+      const url = `https://wa.me/${tel}?text=${encodeURIComponent(mensaje)}`;
+      window.open(url, '_blank');
+    }
+  </script>
+</body>
+</html>
